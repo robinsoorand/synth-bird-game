@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0221"/>
+</head>
+<body>
+    <canvas id="gameCanvas" width="288" height="512"></canvas>
+    <div id="gameOverScreen" class="hidden">
+        <h1>Game Over</h1>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>Best: <span id="bestScore">0</span></p>
+        <div id="birdSelection">
+            <h2>SELECT BIRD</h2>
+            <div class="bird-grid">
+                <div class="bird-option selected" data-bird="0" data-score="0">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>0</span></div>
+                </div>
+                <div class="bird-option" data-bird="1" data-score="5">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>5</span></div>
+                </div>
+                <div class="bird-option" data-bird="2" data-score="10">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>10</span></div>
+                </div>
+                <div class="bird-option" data-bird="3" data-score="15">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>15</span></div>
+                </div>
+                <div class="bird-option" data-bird="4" data-score="25">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>25</span></div>
+                </div>
+                <div class="bird-option" data-bird="5" data-score="50">
+                    <canvas class="bird-preview-canvas" width="40" height="40"></canvas>
+                    <div class="bird-lock">🔒 <span>50</span></div>
+                </div>
+            </div>
+        </div>
+        <button id="restartButton">Restart</button>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

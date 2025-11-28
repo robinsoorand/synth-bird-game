@@ -1,0 +1,16 @@
+{
+  "name": "Synthwave Flappy Bird",
+  "short_name": "Synth Flappy",
+  "description": "A Flappy Bird game with a synthwave aesthetic.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0d0221",
+  "theme_color": "#0d0221",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
