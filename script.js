@@ -199,6 +199,17 @@ function applyTheme(theme) {
     let bgImages = bg.mountains.join(', ') + (bg.mountains.length > 0 ? ', ' : '') + bg.gradient;
     document.body.style.backgroundImage = bgImages;
 
+    // Reset background properties if there are no mountains
+    if (bg.mountains.length === 0) {
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundSize = '100% 100%';
+    } else {
+        document.body.style.backgroundRepeat = 'repeat-x, repeat-x, no-repeat';
+        document.body.style.backgroundPosition = 'bottom, bottom, center';
+        document.body.style.backgroundSize = '100% 45%, 100% 50%, 100% 100%';
+    }
+
     canvas.style.borderColor = theme.canvas.border;
     canvas.style.boxShadow = `0 0 20px ${theme.canvas.shadow}`;
 }
@@ -298,10 +309,6 @@ function update() {
             endGame();
         }
     }
-     // Keep chaos bird animating even on start screen
-    if (birds[selectedBirdIndex].theme.chaos && !gameOver) {
-       draw();
-    }
 }
 
 function setupBirdSelection() {
@@ -365,7 +372,6 @@ function restartGame() {
     gameStarted = false;
     gameOverScreen.classList.add('hidden');
     currentPipeColor = null;
-    gameLoop();
 }
 
 function handleInput() {
@@ -379,13 +385,8 @@ function handleInput() {
 
 function gameLoop() {
     update();
-    // Only draw if not chaos bird (which draws on its own timer in update)
-    if (!birds[selectedBirdIndex].theme.chaos) {
-        draw();
-    }
-    if (!gameOver) {
-        requestAnimationFrame(gameLoop);
-    }
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
 function initializeGame() {
@@ -397,7 +398,7 @@ function initializeGame() {
         }
     }
     applyTheme(birds[selectedBirdIndex].theme);
-    gameLoop();
+    requestAnimationFrame(gameLoop);
 }
 
 document.addEventListener('keydown', e => {
