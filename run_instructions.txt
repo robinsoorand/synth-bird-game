@@ -1,0 +1,9 @@
+To run the Flappy Bird game:
+
+1. Open your terminal or command prompt and navigate to this folder.
+2. Start a simple web server so the browser can load the game files. If you have Python installed, you can use:
+   python3 -m http.server 8080
+   (or `python -m http.server 8080` depending on your OS)
+3. Open your web browser and go to: http://localhost:8080
+
+Alternatively, you can just double-click the `index.html` file in your file explorer to open it directly in your browser. (Note: some browsers may restrict certain features when opening HTML files directly from the filesystem).
