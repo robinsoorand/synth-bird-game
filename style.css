@@ -17,6 +17,7 @@ body {
     font-family: 'Press Start 2P', cursive;
     overflow: hidden; /* Hide scrollbars from overflowing svg */
     transition: background-color 0.5s ease;
+    filter: grayscale(100%);
 }
 
 canvas {

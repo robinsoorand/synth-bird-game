@@ -403,7 +403,10 @@ function initializeGame() {
 
 document.addEventListener('keydown', e => {
     if (e.code === 'Space') {
-        if (gameOver) return; // Prevent input if game over screen is up
+        if (gameOver) {
+            restartButton.click();
+            return;
+        }
         handleInput();
     }
 });
