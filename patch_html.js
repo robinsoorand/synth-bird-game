@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0d0221"/>
-</head>
-<body>
-    <canvas id="gameCanvas" width="288" height="512"></canvas>
-    <div id="gameOverScreen" class="hidden">
+const fs = require('fs');
+let html = fs.readFileSync('index.html', 'utf8');
+
+// Replace the game over screen contents
+html = html.replace(/<div id="gameOverScreen"[\s\S]*?<script src="script.js">/, `<div id="gameOverScreen" class="hidden">
         <h1>Game Over</h1>
         <p>Score: <span id="finalScore">0</span></p>
         <p>Best: <span id="bestScore">0</span></p>
@@ -20,7 +12,7 @@
             <input type="checkbox" id="devModeToggle"> Dev Mode (Unlock All)
         </label>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <div style="display: flex; gap: 10px;">
             <div id="birdSelection" style="flex: 1;">
                 <h2>BIRD</h2>
                 <div class="bird-grid">
@@ -84,17 +76,6 @@
 
         <button id="restartButton">Restart</button>
     </div>
-    <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-    </script>
-</body>
-</html>
+    <script src="script.js">`);
+
+fs.writeFileSync('index.html', html);
