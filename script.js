@@ -6,153 +6,87 @@ const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScoreEl = document.getElementById('finalScore');
 const bestScoreEl = document.getElementById('bestScore');
 const restartButton = document.getElementById('restartButton');
+const cumulativeScoreDisplay = document.getElementById('cumulativeScoreDisplay');
+const devModeToggle = document.getElementById('devModeToggle');
+let devMode = false;
+
+devModeToggle.addEventListener('change', (e) => {
+    devMode = e.target.checked;
+    setupBirdSelection();
+    setupLevelSelection();
+});
 
 // --- Bird & Theme Configuration ---
 let selectedBirdIndex = 0; // Default to the first bird
 const birds = [
-    { // Bird 0 - "Classic Neon"
+    {
         unlockScore: 0,
-        theme: {
-            bird: { main: '#ff00ff', wing: '#ff99ff', shadow: '#ff00ff' },
-            pipe: { fill: '#0d0221', stroke: '#00ffff', shadow: '#00ffff' },
-            canvas: { border: '#ff00ff', shadow: '#ff00ff' },
-            score: '#ffff00',
-            background: {
-                gradient: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(22,0,48,1) 50%, rgba(131,58,180,1) 100%)',
-                mountains: [
-                    `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3e%3cpolygon fill='%231a0024' stroke='%23ff00ff' stroke-width='4' points='0,400 150,150 300,300 500,100 650,250 800,400'/%3e%3c/svg%3e")`,
-                    `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3e%3cpolygon fill='%230d0221' stroke='%2300ffff' stroke-width='3' points='0,400 250,200 450,350 700,150 800,400'/%3e%3c/svg%3e")`
-                ]
-            }
-        },
+        main: '#ff00ff', wing: '#ff99ff', shadow: '#ff00ff',
         draw: (context, bird) => {
-            const theme = bird.theme.bird;
-            context.fillStyle = theme.main; context.shadowColor = theme.shadow; context.shadowBlur = 10;
+            context.fillStyle = bird.main; context.shadowColor = bird.shadow; context.shadowBlur = 10;
             context.beginPath(); context.ellipse(0, 0, birdWidth / 2, birdHeight / 2, 0, 0, Math.PI * 2); context.fill();
-            context.fillStyle = theme.wing;
+            context.fillStyle = bird.wing;
             context.beginPath(); context.arc(-5, 0, birdHeight / 3, 0, Math.PI * 2); context.fill();
             context.fillStyle = 'white';
             context.beginPath(); context.arc(birdWidth / 4, -birdHeight / 5, 2, 0, Math.PI * 2); context.fill();
         }
     },
-    { // Bird 1 - "Sunset Finch"
+    {
         unlockScore: 5,
-        theme: {
-            bird: { main: '#ff9a00', wing: '#ffeda0', shadow: '#ff9a00' },
-            pipe: { fill: '#2a0035', stroke: '#ff00ff', shadow: '#ff00ff' },
-            canvas: { border: '#f0f', shadow: '#f0f' },
-            score: '#ffffff',
-            background: {
-                gradient: 'linear-gradient(0deg, rgba(20,0,30,1) 0%, rgba(80,20,100,1) 100%)', mountains: []
-            }
-        },
+        main: '#ff9a00', wing: '#ffeda0', shadow: '#ff9a00',
         draw: (context, bird) => {
-            const theme = bird.theme.bird;
-            // Tail
-            context.fillStyle = theme.main; context.shadowColor = theme.shadow; context.shadowBlur = 10;
-            context.beginPath(); context.moveTo(-birdWidth/2, 0); context.lineTo(-birdWidth/2 - 10, -5); context.lineTo(-birdWidth/2 - 10, 5); context.fill();
-            // Body
-            context.beginPath(); context.ellipse(0, 0, birdWidth / 2, birdHeight / 2, 0, 0, Math.PI * 2); context.fill();
-            // Wing
-            context.fillStyle = theme.wing;
-            context.beginPath(); context.ellipse(-5, 0, birdHeight / 2.5, birdHeight / 4, 0, 0, Math.PI * 2); context.fill();
-            // Beak
-            context.fillStyle = theme.main;
-            context.beginPath(); context.moveTo(birdWidth / 2, 0); context.lineTo(birdWidth/2 + 10, -5); context.lineTo(birdWidth/2 + 10, 5); context.fill();
-            // Eye
-            context.fillStyle = '#00ffff';
-            context.beginPath(); context.arc(birdWidth / 4, -birdHeight / 5, 2.5, 0, Math.PI * 2); context.fill();
+            context.fillStyle = bird.main; context.shadowColor = bird.shadow; context.shadowBlur = 15;
+            context.beginPath(); context.moveTo(birdWidth / 2, 0); context.lineTo(-birdWidth / 2, birdHeight / 2); context.lineTo(-birdWidth / 2, -birdHeight / 2); context.fill();
+            context.fillStyle = bird.wing;
+            context.beginPath(); context.moveTo(0, 0); context.lineTo(-birdWidth / 2, birdHeight / 1.5); context.lineTo(-birdWidth / 2, 0); context.fill();
+            context.fillStyle = 'white'; context.beginPath(); context.arc(birdWidth / 6, 0, 2, 0, Math.PI * 2); context.fill();
         }
     },
-    { // Bird 2 - "Grid Runner"
+    {
         unlockScore: 10,
-        theme: {
-            bird: { main: '#00ffff', wing: '#00ffff', shadow: '#00ffff' },
-            pipe: { fill: '#111', stroke: '#00ff00', shadow: '#00ff00' },
-            canvas: { border: '#00ff00', shadow: '#00ff00' },
-            score: '#00ff00',
-            background: {
-                gradient: 'linear-gradient(0deg, #000 0%, #001 50%, #002 100%)', mountains: []
-            }
-        },
+        main: '#00ffff', wing: '#aaffff', shadow: '#00ffff',
         draw: (context, bird) => {
-            const theme = bird.theme.bird;
-            context.strokeStyle = theme.main; context.shadowColor = theme.shadow; context.shadowBlur = 15;
-            context.lineWidth = 3; context.fillStyle = 'rgba(0, 20, 30, 0.8)';
-            // Body (rhombus)
-            context.beginPath(); context.moveTo(birdWidth/2, 0); context.lineTo(0, -birdHeight/2); context.lineTo(-birdWidth/2, 0); context.lineTo(0, birdHeight/2); context.closePath(); context.stroke(); context.fill();
-            // Wing (lines)
-            context.beginPath(); context.moveTo(-10, -5); context.lineTo(5, 0); context.moveTo(-10, 5); context.lineTo(5, 0); context.stroke();
-            // Eye (slit)
-            context.beginPath(); context.moveTo(birdWidth / 4, -birdHeight/5); context.lineTo(birdWidth/4 + 5, -birdHeight/5 - 2); context.stroke();
+            context.fillStyle = bird.main; context.shadowColor = bird.shadow; context.shadowBlur = 12;
+            context.fillRect(-birdWidth/2, -birdHeight/2, birdWidth, birdHeight);
+            context.fillStyle = bird.wing;
+            context.fillRect(-birdWidth/2 - 5, -birdHeight/4, birdWidth/2, birdHeight/2);
+            context.fillStyle = 'white';
+            context.fillRect(birdWidth/4, -birdHeight/4, 4, 4);
         }
     },
-    { // Bird 3 - "Neon Hawk"
+    {
         unlockScore: 15,
-        theme: {
-            bird: { main: '#ff0055', wing: '#ff4488', shadow: '#ff0055' },
-            pipe: { fill: '#000', stroke: '#ff4488', shadow: '#ff4488' },
-            canvas: { border: '#ff0055', shadow: '#ff0055' },
-            score: '#fff',
-            background: { gradient: 'linear-gradient(0deg, #111 0%, #301122 100%)', mountains: [] }
-        },
+        main: '#00ff00', wing: '#88ff88', shadow: '#00ff00',
         draw: (context, bird) => {
-            const theme = bird.theme.bird;
-            context.fillStyle = theme.main; context.shadowColor = theme.shadow; context.shadowBlur = 15;
-            // Tail
-            context.beginPath(); context.moveTo(-birdWidth/2, 0); context.lineTo(-birdWidth/2 - 15, -8); context.lineTo(-birdWidth/2 - 10, 0); context.lineTo(-birdWidth/2 - 15, 8); context.closePath(); context.fill();
-            // Body (aggressive shape)
-            context.beginPath(); context.moveTo(birdWidth/2 + 5, 0); context.lineTo(-5, -birdHeight/2); context.lineTo(-birdWidth/2, 0); context.lineTo(-5, birdHeight/2); context.closePath(); context.fill();
-            // Wing (swept back)
-            context.fillStyle = theme.wing; context.beginPath(); context.moveTo(-5, 0); context.lineTo(10, -birdHeight/4); context.lineTo(10, birdHeight/4); context.closePath(); context.fill();
-             // Eye
-            context.fillStyle = '#00ffff'; context.beginPath(); context.moveTo(birdWidth / 4, -birdHeight/5); context.lineTo(birdWidth/4 + 6, -birdHeight/5-2); context.lineTo(birdWidth/4+3, -birdHeight/5+2); context.closePath(); context.fill();
+             context.fillStyle = bird.main; context.shadowColor = bird.shadow; context.shadowBlur = 10;
+             context.beginPath(); context.moveTo(-birdWidth/2, birdHeight/2); context.quadraticCurveTo(0, -birdHeight, birdWidth/2, birdHeight/2); context.fill();
+             context.fillStyle = bird.wing;
+             context.beginPath(); context.arc(-birdWidth/6, birdHeight/4, birdHeight/4, 0, Math.PI*2); context.fill();
+             context.fillStyle = 'white'; context.beginPath(); context.arc(birdWidth/6, 0, 2, 0, Math.PI*2); context.fill();
         }
     },
-    { // Bird 4 - "Phoenix Fire"
+    {
         unlockScore: 25,
-        theme: {
-            bird: { main: 'yellow', wing: 'red', shadow: 'orange' }, // Will be replaced by gradient
-            pipe: { fill: '#150500', stroke: '#ff5500', shadow: '#ff5500' },
-            canvas: { border: '#ff5500', shadow: '#ff5500' },
-            score: '#ffdd00',
-            background: { gradient: 'linear-gradient(0deg, #330000 0%, #661100 100%)', mountains: [] }
-        },
+        main: 'transparent',
         draw: (context, bird) => {
-            const theme = bird.theme.bird;
-            context.shadowColor = theme.shadow; context.shadowBlur = 20;
-            // Tail Flames
-            let tailGradient = context.createLinearGradient(-birdWidth / 2, 0, -birdWidth/2-15, 0);
-            tailGradient.addColorStop(0, "red"); tailGradient.addColorStop(1, "yellow");
-            context.fillStyle = tailGradient;
-            context.beginPath(); context.moveTo(-birdWidth/2, 0); context.bezierCurveTo(-birdWidth-5, -15, -birdWidth, 15, -birdWidth/2-5, 0); context.fill();
-            // Body Gradient
-            let bodyGradient = context.createRadialGradient(0, 0, 2, 0, 0, birdWidth/1.5);
-            bodyGradient.addColorStop(0, "white"); bodyGradient.addColorStop(0.2, "yellow"); bodyGradient.addColorStop(0.8, "red"); bodyGradient.addColorStop(1, "orange");
+            const time = performance.now() / 200;
+            const bodyGradient = context.createLinearGradient(0, -birdHeight/2, 0, birdHeight/2);
+            bodyGradient.addColorStop(0, '#ff0055'); bodyGradient.addColorStop(0.5, '#cc00ff'); bodyGradient.addColorStop(1, '#00ddff');
+            context.shadowColor = '#cc00ff'; context.shadowBlur = 15;
             context.fillStyle = bodyGradient;
             context.beginPath(); context.ellipse(0, 0, birdWidth / 2, birdHeight / 2 + 2, 0, 0, Math.PI * 2); context.fill();
-            // Head Crest
             context.beginPath(); context.moveTo(birdWidth/4, -birdHeight/2); context.bezierCurveTo(birdWidth/2, -birdHeight, birdWidth/4, -birdHeight, birdWidth/4-5, -birdHeight/2-2); context.fill();
         }
     },
-    { // Bird 5 - "Chaos Orb"
+    {
         unlockScore: 50,
-        theme: {
-            bird: { main: 'white', wing: 'white', shadow: 'white' }, // Placeholder
-            pipe: { fill: 'black', stroke: 'white', shadow: 'white' }, // Placeholder
-            canvas: { border: 'white', shadow: 'white' }, // Placeholder
-            score: 'white',
-            background: { gradient: 'linear-gradient(0deg, #111 0%, #000 100%)', mountains: [] },
-            chaos: true // Special flag
-        },
+        main: 'white',
         draw: (context, bird) => {
             const hue = Math.floor(performance.now() / 10) % 360;
             const color = `hsl(${hue}, 100%, 50%)`;
             const lightColor = `hsl(${hue}, 100%, 75%)`;
             context.shadowColor = color; context.shadowBlur = 25;
-            // Core
             context.fillStyle = 'white'; context.beginPath(); context.arc(0, 0, birdHeight/2.5, 0, Math.PI*2); context.fill();
-            // Energy particles/wings
             context.fillStyle = lightColor;
             for(let i=0; i<3; i++) {
                 const angle = (performance.now() / 100) + (i * Math.PI * 2 / 3);
@@ -160,12 +94,113 @@ const birds = [
                 const y = Math.sin(angle) * birdWidth/1.8;
                 context.beginPath(); context.arc(x,y, 4, 0, Math.PI*2); context.fill();
             }
-             // Core Glow
             context.fillStyle = color; context.beginPath(); context.arc(0, 0, birdHeight/3, 0, Math.PI*2); context.fill();
         }
-    },
+    }
 ];
-// --- End Configuration ---
+
+
+let selectedLevelIndex = 0;
+const levels = [
+    { // Level 0: Monochrome Infinity
+        unlockScore: 0,
+        theme: {
+            pipe: { fill: '#555', stroke: '#fff', shadow: '#fff' },
+            canvas: { border: '#fff', shadow: '#fff' },
+            score: '#fff',
+            background: {
+                gradient: 'linear-gradient(0deg, #111 0%, #333 100%)',
+                mountains: []
+            }
+        },
+        physics: { gravity: 0.5, jump: -8, baseSpeed: 2, speedScaling: 0.1 },
+        gimmick: 'none'
+    },
+    { // Level 1: Moving Pipes
+        unlockScore: 10,
+        theme: {
+            pipe: { fill: '#2a0035', stroke: '#ff00ff', shadow: '#ff00ff' },
+            canvas: { border: '#f0f', shadow: '#f0f' },
+            score: '#ffffff',
+            background: { gradient: 'linear-gradient(0deg, rgba(20,0,30,1) 0%, rgba(80,20,100,1) 100%)', mountains: [] }
+        },
+        physics: { gravity: 0.5, jump: -8, baseSpeed: 2.5, speedScaling: 0.1 },
+        gimmick: 'moving_pipes'
+    },
+    { // Level 2: Speed Rush
+        unlockScore: 25,
+        theme: {
+            pipe: { fill: '#002200', stroke: '#00ff00', shadow: '#00ff00' },
+            canvas: { border: '#0f0', shadow: '#0f0' },
+            score: '#ffffff',
+            background: {
+                gradient: 'linear-gradient(0deg, rgba(0,20,0,1) 0%, rgba(0,80,0,1) 100%)',
+                mountains: [`url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3e%3cpolygon fill='%23001a00' stroke='%2300ff00' stroke-width='4' points='0,400 150,150 300,300 500,100 650,250 800,400'/%3e%3c/svg%3e")`]
+            }
+        },
+        physics: { gravity: 0.5, jump: -8, baseSpeed: 3, speedScaling: 0.3 }, // Fast scaling
+        gimmick: 'none'
+    },
+    { // Level 3: Heavy Bird
+        unlockScore: 50,
+        theme: {
+            pipe: { fill: '#330000', stroke: '#ff0000', shadow: '#ff0000' },
+            canvas: { border: '#f00', shadow: '#f00' },
+            score: '#ffffff',
+            background: { gradient: 'linear-gradient(0deg, #300 0%, #600 100%)', mountains: [] }
+        },
+        physics: { gravity: 1.0, jump: -12, baseSpeed: 2.5, speedScaling: 0.1 }, // Heavy
+        gimmick: 'none'
+    },
+    { // Level 4: Blackouts
+        unlockScore: 150,
+        theme: {
+            pipe: { fill: '#000033', stroke: '#0000ff', shadow: '#0000ff' },
+            canvas: { border: '#00f', shadow: '#00f' },
+            score: '#ffffff',
+            background: { gradient: 'linear-gradient(0deg, #001 0%, #003 100%)', mountains: [] }
+        },
+        physics: { gravity: 0.5, jump: -8, baseSpeed: 2.5, speedScaling: 0.1 },
+        gimmick: 'blackouts'
+    },
+    { // Level 5: Epilepsy Mode
+        unlockScore: 500,
+        theme: {
+            pipe: { fill: '#000', stroke: '#fff', shadow: '#fff' },
+            canvas: { border: '#fff', shadow: '#fff' },
+            score: '#fff',
+            background: { gradient: 'linear-gradient(0deg, #000 0%, #111 100%)', mountains: [] }
+        },
+        physics: { gravity: 0.5, jump: -8, baseSpeed: 3, speedScaling: 0.15 },
+        gimmick: 'epilepsy'
+    }
+];
+
+function setupLevelSelection() {
+    const levelOptions = document.querySelectorAll('.level-option');
+    levelOptions.forEach((option, index) => {
+        const level = levels[index];
+        const isUnlocked = devMode || cumulativeScore >= level.unlockScore;
+
+        option.classList.toggle('locked', !isUnlocked);
+        option.classList.toggle('selected', index === selectedLevelIndex);
+
+        if (isUnlocked) {
+            option.onclick = () => {
+                if(selectedLevelIndex === index) return;
+                selectedLevelIndex = index;
+                localStorage.setItem('flappyBirdSelectedLevel', selectedLevelIndex);
+                document.querySelector('.level-option.selected')?.classList.remove('selected');
+                option.classList.add('selected');
+                applyTheme(level.theme);
+            };
+        } else {
+            option.onclick = null;
+        }
+    });
+}
+
+
 
 
 // Game variables
@@ -191,13 +226,27 @@ let topPipeHeight = Math.random() * (canvas.height - pipeGap);
 let currentPipeColor = null; // For chaos mode
 
 // Score tracking
-let bestScore = localStorage.getItem('flappyBirdBestScore') || 0;
+let bestScore = parseInt(localStorage.getItem('flappyBirdBestScore'), 10) || 0;
+if (isNaN(bestScore)) bestScore = 0;
+let cumulativeScore = parseInt(localStorage.getItem('flappyBirdCumulativeScore'), 10) || 0;
+if (isNaN(cumulativeScore)) cumulativeScore = 0;
 bestScoreEl.textContent = bestScore;
 
 function applyTheme(theme) {
     const bg = theme.background;
     let bgImages = bg.mountains.join(', ') + (bg.mountains.length > 0 ? ', ' : '') + bg.gradient;
     document.body.style.backgroundImage = bgImages;
+
+    // Reset background properties if there are no mountains
+    if (bg.mountains.length === 0) {
+        document.body.style.backgroundRepeat = 'no-repeat';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundSize = '100% 100%';
+    } else {
+        document.body.style.backgroundRepeat = 'repeat-x, repeat-x, no-repeat';
+        document.body.style.backgroundPosition = 'bottom, bottom, center';
+        document.body.style.backgroundSize = '100% 45%, 100% 50%, 100% 100%';
+    }
 
     canvas.style.borderColor = theme.canvas.border;
     canvas.style.boxShadow = `0 0 20px ${theme.canvas.shadow}`;
@@ -215,7 +264,9 @@ function drawPipe(x, y, height, isTop) {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const currentBird = birds[selectedBirdIndex];
-    const currentTheme = currentBird.theme;
+    const currentLevel = levels[selectedLevelIndex];
+    const currentTheme = currentLevel.theme;
+    const currentPhysics = currentLevel.physics;
 
     // Draw Bird
     ctx.save();
@@ -228,18 +279,19 @@ function draw() {
     ctx.restore();
 
     // Draw Pipes
-    if (currentTheme.chaos) {
-        if (currentPipeColor === null) {
-             const hue = Math.floor(Math.random() * 360);
-             currentPipeColor = `hsl(${hue}, 100%, 50%)`;
-        }
-        ctx.strokeStyle = currentPipeColor;
-        ctx.shadowColor = currentPipeColor;
+    if (currentLevel.gimmick === 'epilepsy') {
+        const hue = Math.floor(Math.random() * 360);
+        const randomColor = `hsl(${hue}, 100%, 50%)`;
+        ctx.strokeStyle = randomColor;
+        ctx.shadowColor = randomColor;
+        ctx.fillStyle = `hsl(${(hue + 180) % 360}, 100%, 50%)`; // Complementary fill
+        canvas.style.borderColor = randomColor;
+        canvas.style.boxShadow = `0 0 20px ${randomColor}`;
     } else {
         ctx.strokeStyle = currentTheme.pipe.stroke;
         ctx.shadowColor = currentTheme.pipe.shadow;
+        ctx.fillStyle = currentTheme.pipe.fill;
     }
-    ctx.fillStyle = currentTheme.pipe.fill;
     ctx.lineWidth = 3;
     ctx.shadowBlur = 15;
     const bottomPipeY = topPipeHeight + pipeGap;
@@ -255,6 +307,15 @@ function draw() {
     ctx.textAlign = 'left'; 
     ctx.textBaseline = 'top';
     ctx.fillText('Score: ' + score, 10, 10);
+
+    // Blackouts Gimmick
+    if (currentLevel.gimmick === 'blackouts') {
+        const time = performance.now();
+        if (time % 3000 < 500) { // Black out for 500ms every 3 seconds
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+    }
 
     // Draw Start Screen Text
     if (!gameStarted && !gameOver) {
@@ -283,9 +344,16 @@ function checkPipeCollision() {
 function update() {
     if (gameOver) return;
     if (gameStarted) {
-        velocity += gravity;
+        const currentLevel = levels[selectedLevelIndex];
+        const physics = currentLevel.physics;
+        velocity += physics.gravity;
         birdY += velocity;
-        pipeX -= (2 + score * 0.1);
+        pipeX -= (physics.baseSpeed + score * physics.speedScaling);
+
+        // Moving Pipes Gimmick
+        if (currentLevel.gimmick === 'moving_pipes') {
+            topPipeHeight += Math.sin(performance.now() / 500) * 2;
+        }
 
         if (pipeX + pipeWidth < 0) {
             pipeX = canvas.width;
@@ -298,17 +366,13 @@ function update() {
             endGame();
         }
     }
-     // Keep chaos bird animating even on start screen
-    if (birds[selectedBirdIndex].theme.chaos && !gameOver) {
-       draw();
-    }
 }
 
 function setupBirdSelection() {
     const birdOptions = document.querySelectorAll('.bird-option');
     birdOptions.forEach((option, index) => {
         const bird = birds[index];
-        const isUnlocked = bestScore >= bird.unlockScore;
+        const isUnlocked = devMode || bestScore >= bird.unlockScore;
 
         option.classList.toggle('locked', !isUnlocked);
         option.classList.toggle('selected', index === selectedBirdIndex);
@@ -320,7 +384,6 @@ function setupBirdSelection() {
                 localStorage.setItem('flappyBirdSelectedBird', selectedBirdIndex);
                 document.querySelector('.bird-option.selected').classList.remove('selected');
                 option.classList.add('selected');
-                applyTheme(bird.theme);
             };
         } else {
             option.onclick = null;
@@ -332,7 +395,6 @@ function setupBirdSelection() {
         previewCtx.save();
         previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
         
-        // Use temporary smaller dimensions for preview drawing
         const tempWidth = birdWidth, tempHeight = birdHeight;
         birdWidth = 25; birdHeight = 18;
         bird.draw(previewCtx, bird);
@@ -346,13 +408,18 @@ function endGame() {
     gameOver = true;
     gameStarted = false;
     finalScoreEl.textContent = score;
+
+    cumulativeScore += score;
+    localStorage.setItem('flappyBirdCumulativeScore', cumulativeScore);
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem('flappyBirdBestScore', bestScore);
         bestScoreEl.textContent = bestScore;
     }
     gameOverScreen.classList.remove('hidden');
+    cumulativeScoreDisplay.textContent = cumulativeScore;
     setupBirdSelection();
+    setupLevelSelection();
 }
 
 function restartGame() {
@@ -365,7 +432,6 @@ function restartGame() {
     gameStarted = false;
     gameOverScreen.classList.add('hidden');
     currentPipeColor = null;
-    gameLoop();
 }
 
 function handleInput() {
@@ -373,36 +439,44 @@ function handleInput() {
         gameStarted = true;
     }
     if (!gameOver) {
-        velocity = jump;
+        const physics = levels[selectedLevelIndex].physics;
+        velocity = physics.jump;
     }
 }
 
 function gameLoop() {
     update();
-    // Only draw if not chaos bird (which draws on its own timer in update)
-    if (!birds[selectedBirdIndex].theme.chaos) {
-        draw();
-    }
-    if (!gameOver) {
-        requestAnimationFrame(gameLoop);
-    }
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
 function initializeGame() {
     const savedBirdIndex = localStorage.getItem('flappyBirdSelectedBird');
     if (savedBirdIndex !== null) {
         let potentialIndex = parseInt(savedBirdIndex, 10);
-        if (bestScore >= birds[potentialIndex].unlockScore) {
+        if (devMode || bestScore >= birds[potentialIndex].unlockScore) {
              selectedBirdIndex = potentialIndex;
         }
     }
-    applyTheme(birds[selectedBirdIndex].theme);
+
+    const savedLevelIndex = localStorage.getItem('flappyBirdSelectedLevel');
+    if (savedLevelIndex !== null) {
+        let potentialIndex = parseInt(savedLevelIndex, 10);
+        if (devMode || cumulativeScore >= levels[potentialIndex].unlockScore) {
+             selectedLevelIndex = potentialIndex;
+        }
+    }
+
+    applyTheme(levels[selectedLevelIndex].theme);
     gameLoop();
 }
 
 document.addEventListener('keydown', e => {
     if (e.code === 'Space') {
-        if (gameOver) return; // Prevent input if game over screen is up
+        if (gameOver) {
+            restartButton.click();
+            return;
+        }
         handleInput();
     }
 });
